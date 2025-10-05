@@ -1,4 +1,4 @@
-# AgenticMem - Cross-Platform Memory Layer for AI Agents
+# Pensieve - Cross-Platform Memory Layer for AI Agents
 
 ## Vision
 Build a user-owned, cross-platform memory layer for AI agents that seamlessly unifies personal data across applications.
@@ -73,8 +73,8 @@ Native Teams application for enhanced integration and bot capabilities.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/srwshkrshnn/AgenticMem.git
-   cd AgenticMem
+   git clone https://github.com/Achint-Agrawal/Pensieve.git
+   cd Pensieve
    ```
 
 2. **Set up the backend server**

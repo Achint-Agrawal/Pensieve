@@ -1,6 +1,8 @@
-# Memories Service
+# Pensieve Server
 
 A Django-based RESTful API service that stores and retrieves memories with vector embeddings using Azure Cosmos DB and Azure OpenAI.
+
+> **Note:** The Django project is internally named `memories_project` for structural reasons, but the overall system is called "Pensieve".
 
 ## Features
 

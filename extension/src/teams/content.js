@@ -1,4 +1,4 @@
-console.log('[AgenticMem] Teams Content script loaded', new Date().toISOString());
+console.log('[Pensieve] Teams Content script loaded', new Date().toISOString());
 
 // Configuration
 const CONFIG = {
@@ -36,7 +36,7 @@ const auth = {
                 return { token: stored.idToken, isAuthenticated: true };
             }
         } catch (error) {
-            console.warn('[AgenticMem] Auth error:', error);
+            console.warn('[Pensieve] Auth error:', error);
         }
         return { isAuthenticated: false };
     },
@@ -64,18 +64,18 @@ function getTextarea() {
     for (const selector of SELECTORS.textInputs) {
         const element = document.querySelector(selector);
         if (element) {
-            console.log(`[AgenticMem] Found input: ${selector}`);
+            console.log(`[Pensieve] Found input: ${selector}`);
             return element;
         }
     }
-    console.warn('[AgenticMem] No text input found');
+    console.warn('[Pensieve] No text input found');
     return null;
 }
 
 function setTextContent(element, content) {
     if (!element) return false;
     
-    console.log('[AgenticMem] Setting content:', content.substring(0, 100) + '...');
+    console.log('[Pensieve] Setting content:', content.substring(0, 100) + '...');
     
     try {
         if (element.tagName === 'TEXTAREA') {
@@ -95,21 +95,21 @@ function setTextContent(element, content) {
         
         return true;
     } catch (error) {
-        console.error('[AgenticMem] Failed to set content:', error);
+        console.error('[Pensieve] Failed to set content:', error);
         return false;
     }
 }
 
 // Message retrieval
 function getLastMessage() {
-    console.log('[AgenticMem] Getting last message...');
+    console.log('[Pensieve] Getting last message...');
     
     // Find message container
     let container = document.querySelector(SELECTORS.messageContainer);
-    console.log('[AgenticMem] Primary container selector result:', !!container, SELECTORS.messageContainer);
+    console.log('[Pensieve] Primary container selector result:', !!container, SELECTORS.messageContainer);
     
     if (!container) {
-        console.log('[AgenticMem] Primary container not found, trying alternatives...');
+        console.log('[Pensieve] Primary container not found, trying alternatives...');
         // Try alternatives with detailed logging
         const alternatives = [
             '[data-tid="chat-pane-list"]',
@@ -125,26 +125,26 @@ function getLastMessage() {
         
         for (const selector of alternatives) {
             container = document.querySelector(selector);
-            console.log(`[AgenticMem] Trying ${selector}:`, !!container);
+            console.log(`[Pensieve] Trying ${selector}:`, !!container);
             if (container) {
-                console.log('[AgenticMem] Found container with selector:', selector);
-                console.log('[AgenticMem] Container element:', container);
-                console.log('[AgenticMem] Container children count:', container.children.length);
+                console.log('[Pensieve] Found container with selector:', selector);
+                console.log('[Pensieve] Container element:', container);
+                console.log('[Pensieve] Container children count:', container.children.length);
                 break;
             }
         }
         
         if (!container) {
-            console.log('[AgenticMem] No message container found with any selector');
+            console.log('[Pensieve] No message container found with any selector');
             // Let's try to find ANY element that might contain messages
             const anyMessageElements = document.querySelectorAll('[data-tid*="message"], [class*="message"], [role="listitem"]');
-            console.log('[AgenticMem] Found elements with message-related attributes:', anyMessageElements.length);
+            console.log('[Pensieve] Found elements with message-related attributes:', anyMessageElements.length);
             if (anyMessageElements.length > 0) {
-                console.log('[AgenticMem] Sample message-related elements:', Array.from(anyMessageElements).slice(0, 3));
+                console.log('[Pensieve] Sample message-related elements:', Array.from(anyMessageElements).slice(0, 3));
                 // Try to find their common parent
                 if (anyMessageElements.length > 0) {
                     container = anyMessageElements[0].parentElement;
-                    console.log('[AgenticMem] Using parent of first message element as container:', container);
+                    console.log('[Pensieve] Using parent of first message element as container:', container);
                 }
             }
             
@@ -156,18 +156,18 @@ function getLastMessage() {
     
     // Find messages
     let messages = container.querySelectorAll(SELECTORS.messageBubble);
-    console.log('[AgenticMem] Primary message selector result:', messages.length, SELECTORS.messageBubble);
+    console.log('[Pensieve] Primary message selector result:', messages.length, SELECTORS.messageBubble);
     
     // Get last message content
     const lastMessage = messages[messages.length - 1];
-    console.log('[AgenticMem] Processing last message element:', lastMessage);
-    console.log('[AgenticMem] Last message innerHTML preview:', lastMessage.innerHTML?.substring(0, 200));
+    console.log('[Pensieve] Processing last message element:', lastMessage);
+    console.log('[Pensieve] Last message innerHTML preview:', lastMessage.innerHTML?.substring(0, 200));
     
     let content = lastMessage.querySelector(SELECTORS.messageContent);
-    console.log('[AgenticMem] Primary content selector result:', !!content, SELECTORS.messageContent);
+    console.log('[Pensieve] Primary content selector result:', !!content, SELECTORS.messageContent);
     
     if (!content) {
-        console.log('[AgenticMem] Primary content selector failed, trying alternatives...');
+        console.log('[Pensieve] Primary content selector failed, trying alternatives...');
         // Try alternatives with detailed logging
         const contentSelectors = [
             '.message-body', 
@@ -183,20 +183,20 @@ function getLastMessage() {
         
         for (const selector of contentSelectors) {
             content = lastMessage.querySelector(selector);
-            console.log(`[AgenticMem] Trying content selector ${selector}:`, !!content);
+            console.log(`[Pensieve] Trying content selector ${selector}:`, !!content);
             if (content && content.textContent?.trim()) {
-                console.log('[AgenticMem] Found content with selector:', selector);
-                console.log('[AgenticMem] Content preview:', content.textContent.substring(0, 100));
+                console.log('[Pensieve] Found content with selector:', selector);
+                console.log('[Pensieve] Content preview:', content.textContent.substring(0, 100));
                 break;
             }
         }
     }
     
     const text = content ? (content.textContent || content.innerText || '') : lastMessage.textContent || '';
-    console.log('[AgenticMem] Extracted text:', text.substring(0, 200));
+    console.log('[Pensieve] Extracted text:', text.substring(0, 200));
     
     if (!text.trim()) {
-        console.log('[AgenticMem] No text content found in last message');
+        console.log('[Pensieve] No text content found in last message');
         return null;
     }
     
@@ -209,7 +209,7 @@ function getLastMessage() {
 
 // Memory retrieval
 async function retrieveMemories() {
-    console.log('[AgenticMem] Retrieving memories...');
+    console.log('[Pensieve] Retrieving memories...');
     
     const lastMessage = getLastMessage();
     
@@ -221,7 +221,7 @@ async function retrieveMemories() {
     
     const context = lastMessage.text;
     
-    console.log('[AgenticMem] Context (last message only):', context.substring(0, 100) + '...');
+    console.log('[Pensieve] Context (last message only):', context.substring(0, 100) + '...');
     showNotification('Retrieving memories...', 'info');
     
     try {
@@ -243,7 +243,7 @@ async function retrieveMemories() {
         injectMemories(memories);
         
     } catch (error) {
-        console.error('[AgenticMem] Retrieval error:', error);
+        console.error('[Pensieve] Retrieval error:', error);
         showNotification(`Error: ${error.message}`, 'error');
     }
 }
@@ -260,7 +260,7 @@ function injectMemories(memories) {
 
 function createSuggestedReply(suggestionText, fullMemories) {
     // Remove any existing suggested replies
-    const existingSuggestion = document.querySelector('#agenticmem-suggestion');
+    const existingSuggestion = document.querySelector('#pensieve-suggestion');
     if (existingSuggestion) {
         existingSuggestion.remove();
     }
@@ -271,14 +271,14 @@ function createSuggestedReply(suggestionText, fullMemories) {
                        document.querySelector('[contenteditable="true"]');
     
     if (!composeArea) {
-        console.warn('[AgenticMem] Could not find compose area for suggested reply');
+        console.warn('[Pensieve] Could not find compose area for suggested reply');
         showNotification('Could not create suggested reply', 'warning');
         return;
     }
 
     // Create suggestion container
     const suggestionContainer = document.createElement('div');
-    suggestionContainer.id = 'agenticmem-suggestion';
+    suggestionContainer.id = 'pensieve-suggestion';
     suggestionContainer.style.cssText = `
         margin: 8px 0;
         padding: 12px;
@@ -293,26 +293,26 @@ function createSuggestedReply(suggestionText, fullMemories) {
     `;
 
     // Add CSS animation
-    if (!document.querySelector('#agenticmem-styles')) {
+    if (!document.querySelector('#pensieve-styles')) {
         const style = document.createElement('style');
-        style.id = 'agenticmem-styles';
+        style.id = 'pensieve-styles';
         style.textContent = `
             @keyframes slideIn {
                 from { opacity: 0; transform: translateY(-10px); }
                 to { opacity: 1; transform: translateY(0); }
             }
-            .agenticmem-suggestion-text {
+            \.pensieve-suggestion-text {
                 color: #323130;
                 line-height: 1.4;
                 margin-bottom: 8px;
                 padding-right: 24px;
             }
-            .agenticmem-buttons {
+            \.pensieve-buttons {
                 display: flex;
                 gap: 8px;
                 align-items: center;
             }
-            .agenticmem-btn {
+            \.pensieve-btn {
                 padding: 6px 12px;
                 border-radius: 4px;
                 border: none;
@@ -321,23 +321,23 @@ function createSuggestedReply(suggestionText, fullMemories) {
                 transition: all 0.2s ease;
                 font-weight: 500;
             }
-            .agenticmem-btn-primary {
+            \.pensieve-btn-primary {
                 background: #0078d4;
                 color: white;
             }
-            .agenticmem-btn-primary:hover {
+            \.pensieve-btn-primary:hover {
                 background: #106ebe;
                 transform: translateY(-1px);
             }
-            .agenticmem-btn-secondary {
+            \.pensieve-btn-secondary {
                 background: #f3f2f1;
                 color: #323130;
                 border: 1px solid #d2d0ce;
             }
-            .agenticmem-btn-secondary:hover {
+            \.pensieve-btn-secondary:hover {
                 background: #edebe9;
             }
-            .agenticmem-close {
+            \.pensieve-close {
                 position: absolute;
                 top: 8px;
                 right: 8px;
@@ -353,7 +353,7 @@ function createSuggestedReply(suggestionText, fullMemories) {
                 justify-content: center;
                 border-radius: 2px;
             }
-            .agenticmem-close:hover {
+            \.pensieve-close:hover {
                 background: #edebe9;
             }
         `;
@@ -361,16 +361,16 @@ function createSuggestedReply(suggestionText, fullMemories) {
     }
 
     suggestionContainer.innerHTML = `
-        <button class="agenticmem-close" title="Dismiss">×</button>
-        <div class="agenticmem-suggestion-text">
-            <strong>💡 AgenticMem Suggestion:</strong><br>
+        <button class="pensieve-close" title="Dismiss">×</button>
+        <div class="pensieve-suggestion-text">
+            <strong>💡 Pensieve Suggestion:</strong><br>
             ${suggestionText.length > 200 ? suggestionText.substring(0, 200) + '...' : suggestionText}
         </div>
-        <div class="agenticmem-buttons">
-            <button class="agenticmem-btn agenticmem-btn-primary" id="use-suggestion">
+        <div class="pensieve-buttons">
+            <button class="pensieve-btn pensieve-btn-primary" id="use-suggestion">
                 Use This Reply
             </button>
-            <button class="agenticmem-btn agenticmem-btn-secondary" id="view-details">
+            <button class="pensieve-btn pensieve-btn-secondary" id="view-details">
                 View Details
             </button>
             <span style="color: #605e5c; font-size: 11px; margin-left: auto;">
@@ -385,7 +385,7 @@ function createSuggestedReply(suggestionText, fullMemories) {
     // Add event listeners
     const useButton = suggestionContainer.querySelector('#use-suggestion');
     const detailsButton = suggestionContainer.querySelector('#view-details');
-    const closeButton = suggestionContainer.querySelector('.agenticmem-close');
+    const closeButton = suggestionContainer.querySelector('\.pensieve-close');
 
     useButton.addEventListener('click', () => {
         const textarea = getTextarea();
@@ -536,7 +536,7 @@ function showNotification(message, type = 'info') {
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         max-width: 300px;
     `;
-    notification.textContent = `[AgenticMem] ${message}`;
+    notification.textContent = `[Pensieve] ${message}`;
     
     document.body.appendChild(notification);
     
@@ -550,7 +550,7 @@ function showNotification(message, type = 'info') {
 
 // Event handlers
 function startAutoRetrieval() {
-    console.log('[AgenticMem] Starting message change monitoring');
+    console.log('[Pensieve] Starting message change monitoring');
     
     // Clear any existing timer
     if (autoRetrievalTimer) {
@@ -564,19 +564,19 @@ function startAutoRetrieval() {
             
             // Check if we have a new message
             if (lastKnownMessage != currentMessage?.text && !currentMessage?.isFromCurrentUser) {
-                console.log('[AgenticMem] Message changed, retrieving memories');
+                console.log('[Pensieve] Message changed, retrieving memories');
                 await retrieveMemories();
                 lastKnownMessage = currentMessage?.text; // Update known message
             }
         } catch (error) {
-            console.error('[AgenticMem] Error in auto-retrieval:', error);
+            console.error('[Pensieve] Error in auto-retrieval:', error);
             showNotification(`Auto-retrieval error: ${error.message}`, 'error');
         }
     }, 2000); // Check every 2 seconds
 }
 
 function stopAutoRetrieval() {
-    console.log('[AgenticMem] Stopping message change monitoring');
+    console.log('[Pensieve] Stopping message change monitoring');
     if (autoRetrievalTimer) {
         clearInterval(autoRetrievalTimer);
         autoRetrievalTimer = null;
@@ -596,7 +596,7 @@ function bindEvents(element) {
             try {
                 await retrieveMemories();
             } catch (error) {
-                console.error('[AgenticMem] Manual retrieval error:', error);
+                console.error('[Pensieve] Manual retrieval error:', error);
                 showNotification(`Manual retrieval error: ${error.message}`, 'error');
             }
         }
@@ -623,7 +623,7 @@ if (document.readyState === 'loading') {
 try {
     new MutationObserver(bindAll).observe(document.body, { childList: true, subtree: true });
 } catch (e) {
-    console.warn('[AgenticMem] MutationObserver failed:', e);
+    console.warn('[Pensieve] MutationObserver failed:', e);
 }
 
 // Handle extension messages
@@ -634,7 +634,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         retrieveMemories()
             .then(() => sendResponse({ ok: true }))
             .catch(err => {
-                console.error('[AgenticMem] Message handler error:', err);
+                console.error('[Pensieve] Message handler error:', err);
                 sendResponse({ ok: false, error: err.message });
             });
         return true; // Indicates we will respond asynchronously
@@ -653,6 +653,7 @@ setInterval(() => {
         stopAutoRetrieval();
         startAutoRetrieval();
         
-        console.log('[AgenticMem] URL changed, state reset and message monitoring restarted');
+        console.log('[Pensieve] URL changed, state reset and message monitoring restarted');
     }
 }, 1000);
+
